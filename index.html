@@ -110,7 +110,7 @@ html{scroll-behavior:smooth}
 </header>
 
 <nav class="toc" aria-label="章節">
-  <a href="#plan">時程</a><a href="#review">複習</a><a href="#fg">F、G 檢討</a><a href="#date">日期範圍</a><a href="#left">LEFT JOIN</a><a href="#distinct">DISTINCT 與前 N 名</a><a href="#apply">帶入題目</a><a href="#flow">解題流程</a><a href="#lab">實作</a><a href="#mock">模擬考</a><a href="#ans">參考解答</a>
+  <a href="#plan">時程</a><a href="#review">複習</a><a href="#fg">F、G 檢討</a><a href="#date">日期範圍</a><a href="#left">LEFT JOIN</a><a href="#distinct">DISTINCT 與前 N 名</a><a href="#apply">帶入題目</a><a href="#flow">解題流程</a><a href="#lab">實作</a><a href="#ans">參考解答</a><a href="#mock">模擬考</a>
 </nav>
 
 <section id="plan">
@@ -125,7 +125,7 @@ html{scroll-behavior:smooth}
       <tr><td>19:20–19:30</td><td>新觀念 3：COUNT(DISTINCT) 與前 N 名排序</td><td>—</td></tr>
       <tr><td>19:30–19:40</td><td>帶入題目：一起拆解 H、I、J 要用哪些觀念</td><td><span class="pill new">H</span> <span class="pill new">I</span> <span class="pill new">J</span></td></tr>
       <tr><td>19:40–20:15</td><td>實作時間：完成 H、I、J 並上傳 DOMjudge</td><td>H、I、J</td></tr>
-      <tr><td>20:15–20:30</td><td>模擬考題說明、Day14 考核提醒</td><td>模擬題 M1–M4</td></tr>
+      <tr><td>20:15–20:30</td><td>模擬考、Day14 考核提醒</td><td>—</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -359,17 +359,6 @@ html{scroll-behavior:smooth}
   <p class="lead">評分用的資料集和練習資料不同，不要把答案寫死成參考輸出的數字或 ID。</p>
 </section>
 
-<section id="mock">
-  <h2>模擬考題 <span class="tm">20:15–20:30 · 課後完成</span></h2>
-  <p>Day14 是考核。以下四題不在 DOMjudge 上，請在 MySQL Workbench 對 sakila 自行練習，每題都混合了兩個以上的觀念。</p>
-  <div class="grid2">
-    <div class="card"><span class="lbl">M1 · LEFT JOIN + GROUP BY</span><p>列出每個電影類別的名稱與影片數量（沒有影片的類別顯示 0），依數量遞減、名稱遞增。<br><span class="lead">表：category、film_category</span></p></div>
-    <div class="card"><span class="lbl">M2 · LEFT JOIN + IS NULL</span><p>找出從未被租借過的庫存，輸出 inventory_id 與 film_id，依 inventory_id 遞增。<br><span class="lead">表：inventory、rental</span></p></div>
-    <div class="card"><span class="lbl">M3 · JOIN + SUM + CONCAT</span><p>列出每位員工的姓名（last + 空白 + first）與經手的付款總金額，依總金額遞減。<br><span class="lead">表：staff、payment</span></p></div>
-    <div class="card"><span class="lbl">M4 · 日期 + HAVING + 前 N 名</span><p>2005 年 7 月付款總額超過 50 元的顧客，輸出姓名與總額，依總額遞減、姓名遞增，取前 10 名。<br><span class="lead">表：customer、payment</span></p></div>
-  </div>
-</section>
-
 <section id="ans">
   <h2>參考解答</h2>
   <p class="lead">先自己寫，卡住再展開。欄位別名照題目的中文欄名取。</p>
@@ -436,40 +425,11 @@ html{scroll-behavior:smooth}
 <span class="k">LIMIT</span> 5;</pre></div>
   </div></details>
 
-  <details><summary>模擬考 M1–M4</summary><div class="in">
-    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="c">-- M1</span>
-<span class="k">SELECT</span> c.name <span class="k">AS</span> 類別名稱, <span class="k">COUNT</span>(fc.film_id) <span class="k">AS</span> 影片數量
-<span class="k">FROM</span> category <span class="k">AS</span> c
-<span class="k">LEFT JOIN</span> film_category <span class="k">AS</span> fc <span class="k">ON</span> fc.category_id = c.category_id
-<span class="k">GROUP BY</span> c.category_id, c.name
-<span class="k">ORDER BY</span> 影片數量 <span class="k">DESC</span>, c.name <span class="k">ASC</span>;
+</section>
 
-<span class="c">-- M2</span>
-<span class="k">SELECT</span> i.inventory_id, i.film_id
-<span class="k">FROM</span> inventory <span class="k">AS</span> i
-<span class="k">LEFT JOIN</span> rental <span class="k">AS</span> r <span class="k">ON</span> r.inventory_id = i.inventory_id
-<span class="k">WHERE</span> r.rental_id <span class="k">IS NULL</span>
-<span class="k">ORDER BY</span> i.inventory_id;
-
-<span class="c">-- M3</span>
-<span class="k">SELECT CONCAT</span>(s.last_name, <span class="s">' '</span>, s.first_name) <span class="k">AS</span> 員工姓名,
-       <span class="k">SUM</span>(p.amount) <span class="k">AS</span> 付款總額
-<span class="k">FROM</span> staff <span class="k">AS</span> s
-<span class="k">JOIN</span> payment <span class="k">AS</span> p <span class="k">ON</span> p.staff_id = s.staff_id
-<span class="k">GROUP BY</span> s.staff_id, s.last_name, s.first_name
-<span class="k">ORDER BY</span> 付款總額 <span class="k">DESC</span>;
-
-<span class="c">-- M4</span>
-<span class="k">SELECT CONCAT</span>(c.last_name, <span class="s">' '</span>, c.first_name) <span class="k">AS</span> 顧客姓名,
-       <span class="k">SUM</span>(p.amount) <span class="k">AS</span> 付款總額
-<span class="k">FROM</span> payment <span class="k">AS</span> p
-<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> p.customer_id = c.customer_id
-<span class="k">WHERE</span> p.payment_date &gt;= <span class="s">'2005-07-01'</span> <span class="k">AND</span> p.payment_date &lt; <span class="s">'2005-08-01'</span>
-<span class="k">GROUP BY</span> c.customer_id, c.last_name, c.first_name
-<span class="k">HAVING SUM</span>(p.amount) &gt; 50
-<span class="k">ORDER BY</span> 付款總額 <span class="k">DESC</span>, 顧客姓名 <span class="k">ASC</span>
-<span class="k">LIMIT</span> 10;</pre></div>
-  </div></details>
+<section id="mock">
+  <h2>模擬考 <span class="tm">20:15–20:30</span></h2>
+  <p>考場：<b class="mono">sql_query_chinook</b></p>
 </section>
 
 <footer>中心後端集訓 · MySQL 第三堂 · 下一堂 Day14 考核（11/19）</footer>
