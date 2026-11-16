@@ -110,7 +110,7 @@ html{scroll-behavior:smooth}
 </header>
 
 <nav class="toc" aria-label="章節">
-  <a href="#plan">時程</a><a href="#review">複習</a><a href="#fg">F、G 檢討</a><a href="#date">日期範圍</a><a href="#left">LEFT JOIN</a><a href="#distinct">DISTINCT 與前 N 名</a><a href="#apply">帶入題目</a><a href="#flow">解題流程</a><a href="#lab">實作</a><a href="#ans">參考解答</a><a href="#mock">模擬考</a>
+  <a href="#plan">時程</a><a href="#review">複習</a><a href="#fg">F、G 檢討</a><a href="#date">日期範圍</a><a href="#left">LEFT JOIN</a><a href="#distinct">DISTINCT 與前 N 名</a><a href="#apply">帶入題目</a><a href="#flow">解題流程</a><a href="#lab">課後練習</a><a href="#ans">參考解答</a><a href="#mock">模擬考</a>
 </nav>
 
 <section id="plan">
@@ -118,20 +118,19 @@ html{scroll-behavior:smooth}
   <div class="tbl"><table class="sched">
     <thead><tr><th>時間</th><th>內容</th><th>對應題目</th></tr></thead>
     <tbody>
-      <tr><td>18:30–18:40</td><td>暖身複習：Day11、Day12 觀念快問快答</td><td>A–E</td></tr>
-      <tr><td>18:40–18:55</td><td>課後練習 F、G 檢討</td><td>F、G</td></tr>
-      <tr><td>18:55–19:05</td><td>新觀念 1：日期範圍與 DATETIME 陷阱</td><td>—</td></tr>
-      <tr><td>19:05–19:20</td><td>新觀念 2：LEFT JOIN，沒有配對也要列出來</td><td>—</td></tr>
-      <tr><td>19:20–19:30</td><td>新觀念 3：COUNT(DISTINCT) 與前 N 名排序</td><td>—</td></tr>
-      <tr><td>19:30–19:40</td><td>帶入題目：一起拆解 H、I、J 要用哪些觀念</td><td><span class="pill new">H</span> <span class="pill new">I</span> <span class="pill new">J</span></td></tr>
-      <tr><td>19:40–20:15</td><td>實作時間：完成 H、I、J 並上傳 DOMjudge</td><td>H、I、J</td></tr>
-      <tr><td>20:15–20:30</td><td>模擬考、Day14 考核提醒</td><td>—</td></tr>
+      <tr><td>18:30–18:35</td><td>暖身複習：Day11、Day12 觀念快問快答</td><td>A–E</td></tr>
+      <tr><td>18:35–18:45</td><td>課後練習 F、G 檢討</td><td>F、G</td></tr>
+      <tr><td>18:45–18:55</td><td>新觀念 1：日期範圍與 DATETIME 陷阱</td><td>—</td></tr>
+      <tr><td>18:55–19:10</td><td>新觀念 2：LEFT JOIN，沒有配對也要列出來</td><td>—</td></tr>
+      <tr><td>19:10–19:20</td><td>新觀念 3：COUNT(DISTINCT) 與前 N 名排序</td><td>—</td></tr>
+      <tr><td>19:20–19:30</td><td>帶入題目：一起拆解 H、I、J 要用哪些觀念（課後完成並上傳）</td><td><span class="pill new">H</span> <span class="pill new">I</span> <span class="pill new">J</span></td></tr>
+      <tr><td>19:30–20:30</td><td>模擬考（60 分鐘）</td><td>—</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section id="review">
-  <h2>暖身複習 <span class="tm">18:30–18:40</span></h2>
+  <h2>暖身複習 <span class="tm">18:30–18:35</span></h2>
   <p>先看題目要的輸出，再決定要用哪個語法。下面是前兩堂課用過的工具：</p>
   <div class="tbl"><table>
     <thead><tr><th>想做的事</th><th>語法</th><th>出現在</th></tr></thead>
@@ -160,7 +159,7 @@ html{scroll-behavior:smooth}
 </section>
 
 <section id="fg">
-  <h2>課後練習 F、G 檢討 <span class="tm">18:40–18:55</span></h2>
+  <h2>課後練習 F、G 檢討 <span class="tm">18:35–18:45</span></h2>
   <div class="grid2">
     <div class="card"><span class="lbl">F-1 · GROUP BY + HAVING</span><p>付款次數超過 10 次的顧客。先依 <code>customer_id</code> 分組，再用 HAVING 篩群組。</p></div>
     <div class="card"><span class="lbl">F-2 · IS NULL</span><p>仍在租借中（<code>return_date IS NULL</code>）的紀錄。輸出欄位以 PDF 的 Output Format 為準。</p></div>
@@ -172,7 +171,7 @@ html{scroll-behavior:smooth}
 </section>
 
 <section id="date">
-  <h2>新觀念 1：日期範圍 <span class="tm">18:55–19:05</span></h2>
+  <h2>新觀念 1：日期範圍 <span class="tm">18:45–18:55</span></h2>
   <p>sakila 裡的 <code>rental_date</code>、<code>payment_date</code>、<code>return_date</code> 都是 <b>DATETIME</b>，除了日期還帶有時分秒，例如 <code>2005-07-06 14:23:05</code>。</p>
   <p><b>例子</b>：查 2005/7/5 到 2005/7/6 這兩天的所有付款。直覺會寫成 <code>BETWEEN '2005-07-05' AND '2005-07-06'</code>，結果卻少了資料。</p>
 
@@ -199,7 +198,7 @@ html{scroll-behavior:smooth}
 </section>
 
 <section id="left">
-  <h2>新觀念 2：LEFT JOIN <span class="tm">19:05–19:20</span></h2>
+  <h2>新觀念 2：LEFT JOIN <span class="tm">18:55–19:10</span></h2>
   <p>學校有 3 個社團，但「程式設計社」剛成立，還沒有學生加入：</p>
   <div class="grid2">
     <div class="card"><span class="lbl">club · 社團</span>
@@ -259,7 +258,7 @@ html{scroll-behavior:smooth}
 </section>
 
 <section id="distinct">
-  <h2>新觀念 3：COUNT(DISTINCT) 與前 N 名 <span class="tm">19:20–19:30</span></h2>
+  <h2>新觀念 3：COUNT(DISTINCT) 與前 N 名 <span class="tm">19:10–19:20</span></h2>
   <h3>COUNT(DISTINCT)：重複的只算一次</h3>
   <p><b>例子</b>：有多少位顧客付過款？一位顧客會付很多次款，所以 <code>payment</code> 表裡同一個 <code>customer_id</code> 會出現很多次。</p>
   <div class="grid2">
@@ -300,7 +299,7 @@ html{scroll-behavior:smooth}
 </section>
 
 <section id="apply">
-  <h2>帶入題目：H、I、J <span class="tm">19:30–19:40</span></h2>
+  <h2>帶入題目：H、I、J <span class="tm">19:20–19:30</span></h2>
   <p>三個新觀念都學完了，接下來看 DOMjudge 上的題目。先一起拆題，說出每題要用哪些觀念，再開始寫。</p>
 
   <div class="card"><span class="lbl">H · Sakila Task 8 · H.sql</span>
@@ -346,7 +345,7 @@ html{scroll-behavior:smooth}
 </section>
 
 <section id="lab">
-  <h2>實作時間 <span class="tm">19:40–20:15</span></h2>
+  <h2>課後練習：H、I、J <span class="tm">課後完成</span></h2>
   <div class="tbl"><table>
     <thead><tr><th>題目</th><th>上傳檔案</th><th>用到的新觀念</th></tr></thead>
     <tbody>
@@ -428,7 +427,7 @@ html{scroll-behavior:smooth}
 </section>
 
 <section id="mock">
-  <h2>模擬考 <span class="tm">20:15–20:30</span></h2>
+  <h2>模擬考 <span class="tm">19:30–20:30 · 60 分鐘</span></h2>
   <p>考場：<b class="mono">sql_query_chinook</b></p>
 </section>
 
