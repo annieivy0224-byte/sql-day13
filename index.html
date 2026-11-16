@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SQL Day13 講義</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: single reading column (~760px) with a sticky section nav; each section = one lesson block on the class timeline */
+:root{
+  --bg:#f3f5f7; --paper:#ffffff; --ink:#18232e; --muted:#5b6977; --line:#d9e0e6;
+  --accent:#1f6f8b; --accent-soft:#e3f0f5; --trap:#b4471b; --trap-soft:#fbece4; --ok:#2d7a4b; --ok-soft:#e5f3ea;
+  --code-bg:#14212c; --code-fg:#dbe7ef; --kw:#7cc4e4; --str:#f2c879; --cm:#7f93a3;
+  --f-head:"Space Grotesk","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Noto Sans TC",system-ui,-apple-system,"Microsoft JhengHei",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f161d; --paper:#16202a; --ink:#e3eaf0; --muted:#97a6b4; --line:#2a3744;
+  --accent:#5fb3d3; --accent-soft:#183140; --trap:#f08a5d; --trap-soft:#3a2219; --ok:#6fc893; --ok-soft:#173022;
+  --code-bg:#0a1117; --code-fg:#dbe7ef; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f161d; --paper:#16202a; --ink:#e3eaf0; --muted:#97a6b4; --line:#2a3744;
+  --accent:#5fb3d3; --accent-soft:#183140; --trap:#f08a5d; --trap-soft:#3a2219; --ok:#6fc893; --ok-soft:#173022;
+  --code-bg:#0a1117; --code-fg:#dbe7ef; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.75}
+.wrap{max-width:820px;margin:0 auto;padding-block:32px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+header.top{display:flex;flex-direction:column;gap:10px;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+h1{font-family:var(--f-head);font-size:clamp(28px,5vw,40px);line-height:1.2;margin:0;text-wrap:balance;font-weight:700}
+h2{font-family:var(--f-head);font-size:24px;margin:0;text-wrap:balance;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+h2 .tm{font-family:var(--f-mono);font-size:13px;font-weight:400;color:var(--muted)}
+h3{font-size:17px;margin:8px 0 0}
+p{margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--muted);font-size:14px}
+.meta b{color:var(--ink);font-weight:500}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap;display:flex;gap:6px}
+nav.toc a{font-size:13px;color:var(--muted);text-decoration:none;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+section{display:flex;flex-direction:column;gap:14px;scroll-margin-top:60px}
+.lead{color:var(--muted)}
+ul,ol{margin:0;padding-left:1.4em}
+li+li{margin-top:4px}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--accent-soft);padding:1px 5px;border-radius:4px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{padding:7px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:500;color:var(--muted);font-size:13px;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.mono,th.mono{font-family:var(--f-mono);font-size:13px}
+.pre{position:relative;background:var(--code-bg);color:var(--code-fg);border-radius:8px;overflow-x:auto}
+.pre pre{margin:0;padding:14px 16px;font-family:var(--f-mono);font-size:13.5px;line-height:1.65}
+.pre .cp{position:absolute;top:8px;right:8px;font:12px var(--f-body);background:transparent;color:var(--cm);border:1px solid #3a4b5a;border-radius:6px;padding:2px 8px;cursor:pointer}
+.pre .cp:hover,.pre .cp:focus-visible{color:var(--code-fg);border-color:var(--code-fg);outline:none}
+.k{color:var(--kw)} .s{color:var(--str)} .c{color:var(--cm)}
+.note{padding:12px 16px;border-radius:8px;background:var(--accent-soft);font-size:15px}
+.trap{padding:12px 16px;border-radius:8px;background:var(--trap-soft);border-left:3px solid var(--trap);font-size:15px}
+.trap b.t{color:var(--trap)}
+.good{padding:12px 16px;border-radius:8px;background:var(--ok-soft);font-size:15px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.grid2>*{min-width:0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.card .lbl{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+details{background:var(--paper);border:1px solid var(--line);border-radius:8px}
+details>summary{cursor:pointer;padding:10px 16px;font-weight:500;list-style:none;display:flex;justify-content:space-between;gap:12px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"展開";font-size:12px;color:var(--accent);font-weight:400}
+details[open]>summary::after{content:"收合"}
+details>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+details .in{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+.sched td:first-child{font-family:var(--f-mono);white-space:nowrap}
+.pill{display:inline-block;font-size:12px;padding:0 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.pill.new{border-color:var(--accent);color:var(--accent)}
+/* timeline for date trap */
+.tl{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px;overflow-x:auto}
+.tl .bar{position:relative;height:30px;min-width:520px;border-radius:4px;background:var(--bg)}
+.tl .seg{position:absolute;top:0;bottom:0;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;white-space:nowrap}
+.tl .ticks{position:relative;min-width:520px;height:18px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.tl .ticks span{position:absolute;transform:translateX(-50%)}
+.tl .row{display:flex;flex-direction:column;gap:4px}
+.tl .row .cap{font-size:13px;color:var(--muted)}
+.order{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--f-mono);font-size:13px}
+.order span{padding:3px 10px;border-radius:6px;background:var(--paper);border:1px solid var(--line)}
+.order i{color:var(--muted);font-style:normal}
+td.zero{color:var(--trap);font-weight:600}
+td.nul{color:var(--muted);font-style:italic}
+footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">中心後端集訓 · MySQL · Day 13</div>
+  <h1>LEFT JOIN、日期範圍與綜合查詢</h1>
+  <p class="lead">Day11 學會單表查詢，Day12 學會 JOIN、GROUP BY、HAVING。今天補上最後三塊拼圖，把 DOMjudge 題組 H、I、J 寫完，並為 Day14 考核做模擬練習。</p>
+  <div class="meta">
+    <span>日期 <b>2026/11/17（二）</b></span>
+    <span>時間 <b>18:30–20:30</b></span>
+    <span>主講 <b>陳潔如</b></span>
+    <span>考場 <b>sql_query_sakila</b></span>
+    <span>資料庫 <b>MySQL · sakila</b></span>
+  </div>
+</header>
+
+<nav class="toc" aria-label="章節">
+  <a href="#plan">時程</a><a href="#review">複習</a><a href="#fg">F、G 檢討</a><a href="#date">日期範圍</a><a href="#left">LEFT JOIN</a><a href="#distinct">DISTINCT 與前 N 名</a><a href="#apply">帶入題目</a><a href="#flow">解題流程</a><a href="#lab">實作</a><a href="#mock">模擬考</a><a href="#ans">參考解答</a>
+</nav>
+
+<section id="plan">
+  <h2>今天的時程</h2>
+  <div class="tbl"><table class="sched">
+    <thead><tr><th>時間</th><th>內容</th><th>對應題目</th></tr></thead>
+    <tbody>
+      <tr><td>18:30–18:40</td><td>暖身複習：Day11、Day12 觀念快問快答</td><td>A–E</td></tr>
+      <tr><td>18:40–18:55</td><td>課後練習 F、G 檢討</td><td>F、G</td></tr>
+      <tr><td>18:55–19:05</td><td>新觀念 1：日期範圍與 DATETIME 陷阱</td><td>—</td></tr>
+      <tr><td>19:05–19:20</td><td>新觀念 2：LEFT JOIN，沒有配對也要列出來</td><td>—</td></tr>
+      <tr><td>19:20–19:30</td><td>新觀念 3：COUNT(DISTINCT) 與前 N 名排序</td><td>—</td></tr>
+      <tr><td>19:30–19:40</td><td>帶入題目：一起拆解 H、I、J 要用哪些觀念</td><td><span class="pill new">H</span> <span class="pill new">I</span> <span class="pill new">J</span></td></tr>
+      <tr><td>19:40–20:15</td><td>實作時間：完成 H、I、J 並上傳 DOMjudge</td><td>H、I、J</td></tr>
+      <tr><td>20:15–20:30</td><td>模擬考題說明、Day14 考核提醒</td><td>模擬題 M1–M4</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="review">
+  <h2>暖身複習 <span class="tm">18:30–18:40</span></h2>
+  <p>先看題目要的輸出，再決定要用哪個語法。下面是前兩堂課用過的工具：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>想做的事</th><th>語法</th><th>出現在</th></tr></thead>
+    <tbody>
+      <tr><td>選欄位、指定資料表</td><td class="mono">SELECT … FROM …</td><td>A、B-1</td></tr>
+      <tr><td>篩選資料列</td><td class="mono">WHERE</td><td>B-3、C-1</td></tr>
+      <tr><td>加總、計數</td><td class="mono">SUM() / COUNT()</td><td>B-2、D</td></tr>
+      <tr><td>兩張表接起來</td><td class="mono">JOIN … ON a.id = b.id</td><td>C-2、E-2</td></tr>
+      <tr><td>分組後計算</td><td class="mono">GROUP BY</td><td>D-1、D-2</td></tr>
+      <tr><td>篩選「群組」</td><td class="mono">HAVING</td><td>F-1</td></tr>
+      <tr><td>文字合併成一格</td><td class="mono">CONCAT()</td><td>E-1</td></tr>
+      <tr><td>排序、取前幾筆</td><td class="mono">ORDER BY … LIMIT n</td><td>F-3、G</td></tr>
+    </tbody>
+  </table></div>
+  <details>
+    <summary>快問快答 3 題（先想再展開）</summary>
+    <div class="in">
+      <p><b>Q1</b> 要找「付款超過 10 次的顧客」，條件 <code>COUNT(*) &gt; 10</code> 要寫在 WHERE 還是 HAVING？<br>
+      <span class="lead">→ HAVING。WHERE 在分組前執行，那時還沒有 COUNT 的結果。</span></p>
+      <p><b>Q2</b> <code>ON fc.film_id = c.category_id</code> 哪裡錯？<br>
+      <span class="lead">→ 兩邊意義不同。JOIN 要接「表示同一件事」的欄位：<code>fc.category_id = c.category_id</code>。</span></p>
+      <p><b>Q3</b> <code>return_date = NULL</code> 為什麼查不到資料？<br>
+      <span class="lead">→ NULL 不能用等號比較，要寫 <code>IS NULL</code>。</span></p>
+    </div>
+  </details>
+</section>
+
+<section id="fg">
+  <h2>課後練習 F、G 檢討 <span class="tm">18:40–18:55</span></h2>
+  <div class="grid2">
+    <div class="card"><span class="lbl">F-1 · GROUP BY + HAVING</span><p>付款次數超過 10 次的顧客。先依 <code>customer_id</code> 分組，再用 HAVING 篩群組。</p></div>
+    <div class="card"><span class="lbl">F-2 · IS NULL</span><p>仍在租借中（<code>return_date IS NULL</code>）的紀錄。輸出欄位以 PDF 的 Output Format 為準。</p></div>
+    <div class="card"><span class="lbl">F-3 · ORDER BY DESC + LIMIT</span><p>「最近」= 日期最大，要 <b>DESC</b>，再 <code>LIMIT 10</code>。</p></div>
+    <div class="card"><span class="lbl">G-1 · 雙鍵排序</span><p><code>ORDER BY last_name, first_name</code>：姓氏相同才比名字。</p></div>
+    <div class="card"><span class="lbl">G-2 · ASC + LIMIT</span><p>「最便宜」= 租金由小到大，<code>ORDER BY rental_rate ASC LIMIT 10</code>。</p></div>
+  </div>
+  <div class="trap"><b class="t">常見錯誤</b>　多檔題（B、C、D、E、F、G、J）上傳時要<b>一次附上所有檔案</b>，檔名必須完全一致（例如 <code>F-1.sql</code>），少傳或檔名錯都會得到 RUN-ERROR。</div>
+</section>
+
+<section id="date">
+  <h2>新觀念 1：日期範圍 <span class="tm">18:55–19:05</span></h2>
+  <p>sakila 裡的 <code>rental_date</code>、<code>payment_date</code>、<code>return_date</code> 都是 <b>DATETIME</b>，除了日期還帶有時分秒，例如 <code>2005-07-06 14:23:05</code>。</p>
+  <p><b>例子</b>：查 2005/7/5 到 2005/7/6 這兩天的所有付款。直覺會寫成 <code>BETWEEN '2005-07-05' AND '2005-07-06'</code>，結果卻少了資料。</p>
+
+  <div class="tl" role="img" aria-label="BETWEEN 與半開區間涵蓋範圍比較">
+    <div class="ticks"><span style="left:4%">07-05 00:00</span><span style="left:50%">07-06 00:00</span><span style="left:96%">07-07 00:00</span></div>
+    <div class="row"><span class="cap">寫法 A：<code>BETWEEN '2005-07-05' AND '2005-07-06'</code></span>
+      <div class="bar"><div class="seg" style="left:4%;width:46%;background:var(--trap)">只到 07-06 00:00:00</div></div></div>
+    <div class="row"><span class="cap">寫法 B：<code>&gt;= '2005-07-05' AND &lt; '2005-07-07'</code></span>
+      <div class="bar"><div class="seg" style="left:4%;width:92%;background:var(--ok)">包含 7/6 整天</div></div></div>
+  </div>
+
+  <div class="trap"><b class="t">陷阱</b>　只寫日期的 <code>'2005-07-06'</code> 和 DATETIME 比較時，會被當成 <code>2005-07-06 00:00:00</code>。所以寫法 A 只算到 7/6 凌晨 0 點整，7/6 當天其他時間的資料全部漏掉。</div>
+
+  <h3>三種安全寫法</h3>
+  <div class="pre"><button class="cp" type="button">複製</button><pre><span class="c">-- 1. 半開區間（推薦）：結束日期 +1 天，用「小於」</span>
+<span class="k">WHERE</span> payment_date &gt;= <span class="s">'2005-07-05'</span> <span class="k">AND</span> payment_date &lt; <span class="s">'2005-07-07'</span>
+
+<span class="c">-- 2. 先取出日期部分再比較</span>
+<span class="k">WHERE</span> <span class="k">DATE</span>(payment_date) <span class="k">BETWEEN</span> <span class="s">'2005-07-05'</span> <span class="k">AND</span> <span class="s">'2005-07-06'</span>
+
+<span class="c">-- 3. 把結束時間寫到最後一秒</span>
+<span class="k">WHERE</span> payment_date <span class="k">BETWEEN</span> <span class="s">'2005-07-05 00:00:00'</span> <span class="k">AND</span> <span class="s">'2005-07-06 23:59:59'</span></pre></div>
+  <div class="note">延伸：<code>YEAR()</code>、<code>MONTH()</code>、<code>DAY()</code> 可以單獨取出年、月、日，例如 <code>WHERE YEAR(payment_date) = 2005 AND MONTH(payment_date) = 7</code>。</div>
+</section>
+
+<section id="left">
+  <h2>新觀念 2：LEFT JOIN <span class="tm">19:05–19:20</span></h2>
+  <p>學校有 3 個社團，但「程式設計社」剛成立，還沒有學生加入：</p>
+  <div class="grid2">
+    <div class="card"><span class="lbl">club · 社團</span>
+      <div class="tbl"><table><thead><tr><th class="mono">id</th><th>name</th></tr></thead><tbody>
+        <tr><td class="mono">1</td><td>吉他社</td></tr><tr><td class="mono">2</td><td>熱舞社</td></tr><tr><td class="mono">3</td><td>程式設計社</td></tr>
+      </tbody></table></div></div>
+    <div class="card"><span class="lbl">student · 學生</span>
+      <div class="tbl"><table><thead><tr><th class="mono">id</th><th>name</th><th class="mono">club_id</th></tr></thead><tbody>
+        <tr><td class="mono">1</td><td>小明</td><td class="mono">1</td></tr><tr><td class="mono">2</td><td>小華</td><td class="mono">2</td></tr><tr><td class="mono">3</td><td>小美</td><td class="mono">1</td></tr>
+      </tbody></table></div></div>
+  </div>
+  <p>社團博覽會要列出「每個社團有幾位成員」，程式設計社雖然 0 人也要出現。Day12 用的 <code>JOIN</code>（INNER JOIN）只保留兩邊都配對成功的資料，程式設計社配不到任何學生，整列消失。<code>LEFT JOIN</code> 則會保留左表的每一列，配不到的部分補 NULL。</p>
+
+  <div class="grid2">
+    <div class="card"><span class="lbl">club JOIN student</span>
+      <div class="tbl"><table><thead><tr><th>社團</th><th>學生</th></tr></thead><tbody>
+        <tr><td>吉他社</td><td>小明</td></tr><tr><td>吉他社</td><td>小美</td></tr><tr><td>熱舞社</td><td>小華</td></tr>
+      </tbody></table></div>
+      <p class="lead" style="font-size:14px">程式設計社不見了。</p></div>
+    <div class="card"><span class="lbl">club LEFT JOIN student</span>
+      <div class="tbl"><table><thead><tr><th>社團</th><th>學生</th></tr></thead><tbody>
+        <tr><td>吉他社</td><td>小明</td></tr><tr><td>吉他社</td><td>小美</td></tr><tr><td>熱舞社</td><td>小華</td></tr><tr><td>程式設計社</td><td class="nul">NULL</td></tr>
+      </tbody></table></div>
+      <p class="lead" style="font-size:14px">程式設計社留下來，學生欄位是 NULL。</p></div>
+  </div>
+
+  <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> 欄位
+<span class="k">FROM</span> 一定要全部列出的表 <span class="k">AS</span> a          <span class="c">-- 左表</span>
+<span class="k">LEFT JOIN</span> 可能配不到的表 <span class="k">AS</span> b         <span class="c">-- 右表</span>
+       <span class="k">ON</span> b.a_id = a.a_id;</pre></div>
+
+  <h3>每個社團有幾位成員？COUNT(*) 還是 COUNT(欄位)？</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>社團</th><th>LEFT JOIN 後的列</th><th class="mono">COUNT(*)</th><th class="mono">COUNT(s.id)</th></tr></thead>
+    <tbody>
+      <tr><td>吉他社</td><td>2 列</td><td class="mono">2</td><td class="mono">2</td></tr>
+      <tr><td>熱舞社</td><td>1 列</td><td class="mono">1</td><td class="mono">1</td></tr>
+      <tr><td>程式設計社</td><td>1 列（s.id 是 NULL）</td><td class="mono zero">1 ✗</td><td class="mono">0 ✓</td></tr>
+    </tbody>
+  </table></div>
+  <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> c.name <span class="k">AS</span> 社團, <span class="k">COUNT</span>(s.id) <span class="k">AS</span> 成員數
+<span class="k">FROM</span> club <span class="k">AS</span> c
+<span class="k">LEFT JOIN</span> student <span class="k">AS</span> s <span class="k">ON</span> s.club_id = c.id
+<span class="k">GROUP BY</span> c.id, c.name;</pre></div>
+  <div class="trap"><b class="t">陷阱</b>　<code>COUNT(*)</code> 數的是「列數」，LEFT JOIN 補出來的那一列也算 1，程式設計社會變成 1 人。要數「有幾位成員」得用 <code>COUNT(右表的欄位)</code>，COUNT 遇到 NULL 不會計入。</div>
+  <div class="note">左右順序很重要：「所有社團都要列出」→ <code>club</code> 放左邊。寫成 <code>student LEFT JOIN club</code> 的話，保留的是所有學生，程式設計社照樣不見。</div>
+  <details>
+    <summary>延伸：用 LEFT JOIN 找「沒有配對」的資料</summary>
+    <div class="in">
+      <p>LEFT JOIN 之後加 <code>WHERE 右表.主鍵 IS NULL</code>，留下的就是「左表有、右表沒有」的資料，例如還沒有人加入的社團：</p>
+      <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> c.name
+<span class="k">FROM</span> club <span class="k">AS</span> c
+<span class="k">LEFT JOIN</span> student <span class="k">AS</span> s <span class="k">ON</span> s.club_id = c.id
+<span class="k">WHERE</span> s.id <span class="k">IS NULL</span>;   <span class="c">-- 結果：程式設計社</span></pre></div>
+    </div>
+  </details>
+</section>
+
+<section id="distinct">
+  <h2>新觀念 3：COUNT(DISTINCT) 與前 N 名 <span class="tm">19:20–19:30</span></h2>
+  <h3>COUNT(DISTINCT)：重複的只算一次</h3>
+  <p><b>例子</b>：有多少位顧客付過款？一位顧客會付很多次款，所以 <code>payment</code> 表裡同一個 <code>customer_id</code> 會出現很多次。</p>
+  <div class="grid2">
+    <div class="card"><span class="lbl">✗ 數到的是付款筆數</span><div class="pre"><pre><span class="k">SELECT COUNT</span>(customer_id)
+<span class="k">FROM</span> payment;</pre></div></div>
+    <div class="card"><span class="lbl">✓ 去除重複再數</span><div class="pre"><pre><span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> customer_id)
+<span class="k">FROM</span> payment;</pre></div></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>寫法</th><th>數的是</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">COUNT(*)</td><td>列數（含 NULL 的列）</td></tr>
+      <tr><td class="mono">COUNT(欄位)</td><td>該欄位不是 NULL 的列數</td></tr>
+      <tr><td class="mono">COUNT(DISTINCT 欄位)</td><td>該欄位有幾種不同的值</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>前 N 名：同分怎麼辦？</h3>
+  <p><b>例子</b>：庫存份數最多的前 3 部電影。假設分組計數後是這樣：</p>
+  <div class="tbl"><table>
+    <thead><tr><th>片名</th><th class="mono">庫存數</th><th></th></tr></thead>
+    <tbody>
+      <tr><td>ACADEMY DINOSAUR</td><td class="mono">8</td><td>一定是第 1 名</td></tr>
+      <tr><td>BUCKET BROTHERHOOD</td><td class="mono">7</td><td rowspan="3">三部都是 7，只剩 2 個名額</td></tr>
+      <tr><td>APACHE DIVINE</td><td class="mono">7</td></tr>
+      <tr><td>CURTAIN VIDEOTAPE</td><td class="mono">7</td></tr>
+    </tbody>
+  </table></div>
+  <p class="lead" style="font-size:14px">表中數字是教學用的假設值。</p>
+  <p>只寫 <code>ORDER BY 庫存數 DESC LIMIT 3</code> 的話，同分的三部誰排前面由資料庫決定，每次結果可能不同。題目通常會指定<b>第二排序鍵</b>，例如「同分再依片名遞增」：</p>
+  <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> f.title <span class="k">AS</span> 片名, <span class="k">COUNT</span>(*) <span class="k">AS</span> 庫存數
+<span class="k">FROM</span> inventory <span class="k">AS</span> i
+<span class="k">JOIN</span> film <span class="k">AS</span> f <span class="k">ON</span> i.film_id = f.film_id
+<span class="k">GROUP BY</span> f.film_id, f.title          <span class="c">-- 用 ID 分組，避免同名被併在一起</span>
+<span class="k">ORDER BY</span> 庫存數 <span class="k">DESC</span>, f.title <span class="k">ASC</span>   <span class="c">-- 第二排序鍵處理同分</span>
+<span class="k">LIMIT</span> 3;</pre></div>
+  <div class="note">分組要用 <b>ID</b>，不要只用名稱。兩位顧客可能同名同姓，用名稱分組會把兩個人的資料算成一個人。</div>
+</section>
+
+<section id="apply">
+  <h2>帶入題目：H、I、J <span class="tm">19:30–19:40</span></h2>
+  <p>三個新觀念都學完了，接下來看 DOMjudge 上的題目。先一起拆題，說出每題要用哪些觀念，再開始寫。</p>
+
+  <div class="card"><span class="lbl">H · Sakila Task 8 · H.sql</span>
+    <p>查 2005/6/1 到 2005/6/15 之間的所有租借紀錄，輸出租借 ID、租借者姓名（<code>last_name</code> + <code>first_name</code>）、租借時間，依日期遞增排序。表：<code>rental</code>、<code>customer</code>。</p>
+    <p><span class="pill">JOIN</span> <span class="pill new">日期範圍</span> <span class="pill">CONCAT</span> <span class="pill">ORDER BY</span></p>
+    <p class="lead" style="font-size:14px">想一想：姓名在哪張表？「到 6/15」要包含 15 號哪些時間？</p>
+  </div>
+  <div class="trap"><b class="t">H 的提醒</b>　參考輸出裡有 <code>2005-06-15 00:36:40</code>，代表 15 號當天要整天算進去，回想新觀念 1 的寫法 A 和 B。姓名格式是 <code>PINSON JEFFERY</code>，中間一個空白，跟 E-1 的「姓, 名」不一樣。</div>
+
+  <div class="card"><span class="lbl">I · Sakila Task 9 · I.sql</span>
+    <p>列出所有語言與每種語言的電影數量，沒有電影的語言也要列出（數量 0）。依電影數量遞減，同數量再依語言名稱遞增。表：<code>language</code>、<code>film</code>。</p>
+    <p><span class="pill new">LEFT JOIN</span> <span class="pill">GROUP BY</span> <span class="pill new">COUNT(欄位)</span> <span class="pill">雙鍵排序</span></p>
+    <p class="lead" style="font-size:14px">想一想：哪張表要放左邊？它對應到社團例子裡的 club 還是 student？</p>
+  </div>
+  <div class="trap"><b class="t">I 的提醒</b>　sakila 的 1000 部電影全是英文，用 INNER JOIN 只會剩 English 一列。用了 LEFT JOIN 卻寫 <code>COUNT(*)</code>，其他語言會變成 1 而不是 0。</div>
+
+  <div class="card"><span class="lbl">J · Sakila Task 10 · J-1.sql、J-2.sql</span>
+    <p><b>J-1</b>：實際租借過電影的顧客總人數，每位顧客只算一次。<br><b>J-2</b>：租借次數最多的前五名顧客，輸出姓名（last + first）與租借次數。依次數遞減，同次數再依姓名遞增。表：<code>rental</code>、<code>customer</code>。</p>
+    <p><span class="pill new">COUNT(DISTINCT)</span> <span class="pill">JOIN</span> <span class="pill">GROUP BY ID</span> <span class="pill new">前 N 名</span></p>
+    <p class="lead" style="font-size:14px">想一想：J-1 用 COUNT(customer_id) 會數到什麼？J-2 要用什麼欄位分組？</p>
+  </div>
+  <div class="trap"><b class="t">J 的提醒</b>　J-2 參考輸出裡 DEAN MARCIA 和 SHAW CLARA 都是 42 次，少了第二排序鍵就可能順序不對。兩題要一起上傳。</div>
+</section>
+
+<section id="flow">
+  <h2>解題流程與執行順序</h2>
+  <p>寫 SQL 的順序和資料庫執行的順序不同。卡住時照執行順序想一遍：</p>
+  <div class="order" aria-label="SQL 執行順序">
+    <span>FROM / JOIN</span><i>→</i><span>WHERE</span><i>→</i><span>GROUP BY</span><i>→</i><span>HAVING</span><i>→</i><span>SELECT</span><i>→</i><span>ORDER BY</span><i>→</i><span>LIMIT</span>
+  </div>
+  <p class="lead">所以 WHERE 不能用 COUNT 的結果（要用 HAVING），而 ORDER BY 可以用 SELECT 裡取的別名。</p>
+  <div class="tbl"><table>
+    <thead><tr><th>步驟</th><th>問自己</th></tr></thead>
+    <tbody>
+      <tr><td>1. 看輸出欄位</td><td>要幾欄？順序？名字要合併嗎？分隔字元是什麼？</td></tr>
+      <tr><td>2. 找資料表</td><td>欄位在哪幾張表？需要 JOIN 嗎？</td></tr>
+      <tr><td>3. JOIN 種類</td><td>配不到的資料也要列出嗎？要就用 LEFT JOIN，主表放左邊</td></tr>
+      <tr><td>4. 條件</td><td>篩資料列用 WHERE，篩群組用 HAVING；日期範圍注意時分秒</td></tr>
+      <tr><td>5. 分組與計數</td><td>GROUP BY 用 ID；COUNT(*)、COUNT(欄位)、COUNT(DISTINCT) 選哪個？</td></tr>
+      <tr><td>6. 排序</td><td>遞增還是遞減？同分時的第二排序鍵？要 LIMIT 嗎？</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="lab">
+  <h2>實作時間 <span class="tm">19:40–20:15</span></h2>
+  <div class="tbl"><table>
+    <thead><tr><th>題目</th><th>上傳檔案</th><th>用到的新觀念</th></tr></thead>
+    <tbody>
+      <tr><td>H · Sakila Task 8</td><td class="mono">H.sql</td><td>日期範圍</td></tr>
+      <tr><td>I · Sakila Task 9</td><td class="mono">I.sql</td><td>LEFT JOIN、COUNT(欄位)</td></tr>
+      <tr><td>J · Sakila Task 10</td><td class="mono">J-1.sql、J-2.sql</td><td>COUNT(DISTINCT)、前 N 名</td></tr>
+    </tbody>
+  </table></div>
+  <div class="good"><b>提交前檢查</b>　欄位數量與順序正確 · JOIN 用的是同意義的 ID · 有要求排序就寫 ORDER BY（含第二排序鍵）· 多檔題一次上傳全部檔案、檔名正確。</div>
+  <p class="lead">評分用的資料集和練習資料不同，不要把答案寫死成參考輸出的數字或 ID。</p>
+</section>
+
+<section id="mock">
+  <h2>模擬考題 <span class="tm">20:15–20:30 · 課後完成</span></h2>
+  <p>Day14 是考核。以下四題不在 DOMjudge 上，請在 MySQL Workbench 對 sakila 自行練習，每題都混合了兩個以上的觀念。</p>
+  <div class="grid2">
+    <div class="card"><span class="lbl">M1 · LEFT JOIN + GROUP BY</span><p>列出每個電影類別的名稱與影片數量（沒有影片的類別顯示 0），依數量遞減、名稱遞增。<br><span class="lead">表：category、film_category</span></p></div>
+    <div class="card"><span class="lbl">M2 · LEFT JOIN + IS NULL</span><p>找出從未被租借過的庫存，輸出 inventory_id 與 film_id，依 inventory_id 遞增。<br><span class="lead">表：inventory、rental</span></p></div>
+    <div class="card"><span class="lbl">M3 · JOIN + SUM + CONCAT</span><p>列出每位員工的姓名（last + 空白 + first）與經手的付款總金額，依總金額遞減。<br><span class="lead">表：staff、payment</span></p></div>
+    <div class="card"><span class="lbl">M4 · 日期 + HAVING + 前 N 名</span><p>2005 年 7 月付款總額超過 50 元的顧客，輸出姓名與總額，依總額遞減、姓名遞增，取前 10 名。<br><span class="lead">表：customer、payment</span></p></div>
+  </div>
+</section>
+
+<section id="ans">
+  <h2>參考解答</h2>
+  <p class="lead">先自己寫，卡住再展開。欄位別名照題目的中文欄名取。</p>
+
+  <details><summary>F、G 課後練習</summary><div class="in">
+    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="c">-- F-1</span>
+<span class="k">SELECT</span> customer_id, <span class="k">COUNT</span>(*) <span class="k">AS</span> 付款次數
+<span class="k">FROM</span> payment
+<span class="k">GROUP BY</span> customer_id
+<span class="k">HAVING COUNT</span>(*) &gt; 10;
+
+<span class="c">-- F-3</span>
+<span class="k">SELECT</span> rental_id, rental_date
+<span class="k">FROM</span> rental
+<span class="k">ORDER BY</span> rental_date <span class="k">DESC</span>
+<span class="k">LIMIT</span> 10;
+
+<span class="c">-- G-1</span>
+<span class="k">SELECT</span> last_name <span class="k">AS</span> 客戶姓氏, first_name <span class="k">AS</span> 客戶姓名
+<span class="k">FROM</span> customer
+<span class="k">ORDER BY</span> last_name <span class="k">ASC</span>, first_name <span class="k">ASC</span>;
+
+<span class="c">-- G-2</span>
+<span class="k">SELECT</span> title <span class="k">AS</span> 影片名稱, rental_rate <span class="k">AS</span> 影片租金
+<span class="k">FROM</span> film
+<span class="k">ORDER BY</span> rental_rate <span class="k">ASC</span>
+<span class="k">LIMIT</span> 10;</pre></div>
+    <p class="lead" style="font-size:14px">F-2 的輸出欄位請依 PDF 的 Output Format 寫（rental 表只有 inventory_id，若題目要 film_id 需再 JOIN inventory）。</p>
+  </div></details>
+
+  <details><summary>H</summary><div class="in">
+    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> r.rental_id <span class="k">AS</span> 租借ID,
+       <span class="k">CONCAT</span>(c.last_name, <span class="s">' '</span>, c.first_name) <span class="k">AS</span> 租借者姓名,
+       r.rental_date <span class="k">AS</span> 租借時間
+<span class="k">FROM</span> rental <span class="k">AS</span> r
+<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> r.customer_id = c.customer_id
+<span class="k">WHERE</span> r.rental_date &gt;= <span class="s">'2005-06-01'</span>
+  <span class="k">AND</span> r.rental_date &lt;  <span class="s">'2005-06-16'</span>
+<span class="k">ORDER BY</span> r.rental_date <span class="k">ASC</span>, r.rental_id <span class="k">ASC</span>;</pre></div>
+  </div></details>
+
+  <details><summary>I</summary><div class="in">
+    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> l.name <span class="k">AS</span> 語言名稱,
+       <span class="k">COUNT</span>(f.film_id) <span class="k">AS</span> 電影數量
+<span class="k">FROM</span> language <span class="k">AS</span> l
+<span class="k">LEFT JOIN</span> film <span class="k">AS</span> f <span class="k">ON</span> f.language_id = l.language_id
+<span class="k">GROUP BY</span> l.language_id, l.name
+<span class="k">ORDER BY</span> 電影數量 <span class="k">DESC</span>, l.name <span class="k">ASC</span>;</pre></div>
+  </div></details>
+
+  <details><summary>J-1、J-2</summary><div class="in">
+    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="c">-- J-1.sql</span>
+<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> r.customer_id) <span class="k">AS</span> 顧客人數
+<span class="k">FROM</span> rental <span class="k">AS</span> r
+<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> r.customer_id = c.customer_id;
+
+<span class="c">-- J-2.sql</span>
+<span class="k">SELECT CONCAT</span>(c.last_name, <span class="s">' '</span>, c.first_name) <span class="k">AS</span> 顧客姓名,
+       <span class="k">COUNT</span>(*) <span class="k">AS</span> 租借次數
+<span class="k">FROM</span> rental <span class="k">AS</span> r
+<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> r.customer_id = c.customer_id
+<span class="k">GROUP BY</span> c.customer_id, c.last_name, c.first_name
+<span class="k">ORDER BY</span> 租借次數 <span class="k">DESC</span>, 顧客姓名 <span class="k">ASC</span>
+<span class="k">LIMIT</span> 5;</pre></div>
+  </div></details>
+
+  <details><summary>模擬考 M1–M4</summary><div class="in">
+    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="c">-- M1</span>
+<span class="k">SELECT</span> c.name <span class="k">AS</span> 類別名稱, <span class="k">COUNT</span>(fc.film_id) <span class="k">AS</span> 影片數量
+<span class="k">FROM</span> category <span class="k">AS</span> c
+<span class="k">LEFT JOIN</span> film_category <span class="k">AS</span> fc <span class="k">ON</span> fc.category_id = c.category_id
+<span class="k">GROUP BY</span> c.category_id, c.name
+<span class="k">ORDER BY</span> 影片數量 <span class="k">DESC</span>, c.name <span class="k">ASC</span>;
+
+<span class="c">-- M2</span>
+<span class="k">SELECT</span> i.inventory_id, i.film_id
+<span class="k">FROM</span> inventory <span class="k">AS</span> i
+<span class="k">LEFT JOIN</span> rental <span class="k">AS</span> r <span class="k">ON</span> r.inventory_id = i.inventory_id
+<span class="k">WHERE</span> r.rental_id <span class="k">IS NULL</span>
+<span class="k">ORDER BY</span> i.inventory_id;
+
+<span class="c">-- M3</span>
+<span class="k">SELECT CONCAT</span>(s.last_name, <span class="s">' '</span>, s.first_name) <span class="k">AS</span> 員工姓名,
+       <span class="k">SUM</span>(p.amount) <span class="k">AS</span> 付款總額
+<span class="k">FROM</span> staff <span class="k">AS</span> s
+<span class="k">JOIN</span> payment <span class="k">AS</span> p <span class="k">ON</span> p.staff_id = s.staff_id
+<span class="k">GROUP BY</span> s.staff_id, s.last_name, s.first_name
+<span class="k">ORDER BY</span> 付款總額 <span class="k">DESC</span>;
+
+<span class="c">-- M4</span>
+<span class="k">SELECT CONCAT</span>(c.last_name, <span class="s">' '</span>, c.first_name) <span class="k">AS</span> 顧客姓名,
+       <span class="k">SUM</span>(p.amount) <span class="k">AS</span> 付款總額
+<span class="k">FROM</span> payment <span class="k">AS</span> p
+<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> p.customer_id = c.customer_id
+<span class="k">WHERE</span> p.payment_date &gt;= <span class="s">'2005-07-01'</span> <span class="k">AND</span> p.payment_date &lt; <span class="s">'2005-08-01'</span>
+<span class="k">GROUP BY</span> c.customer_id, c.last_name, c.first_name
+<span class="k">HAVING SUM</span>(p.amount) &gt; 50
+<span class="k">ORDER BY</span> 付款總額 <span class="k">DESC</span>, 顧客姓名 <span class="k">ASC</span>
+<span class="k">LIMIT</span> 10;</pre></div>
+  </div></details>
+</section>
+
+<footer>中心後端集訓 · MySQL 第三堂 · 下一堂 Day14 考核（11/19）</footer>
+</div>
+
+<script>
+document.querySelectorAll('.pre .cp').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var pre=btn.parentElement.querySelector('pre');var t=pre.innerText;
+    var done=function(){btn.textContent='已複製';setTimeout(function(){btn.textContent='複製'},1400)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(pre);var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='已選取';setTimeout(function(){btn.textContent='複製'},1400)};
+    try{navigator.clipboard.writeText(t).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+
+</body>
+</html>
