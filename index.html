@@ -90,6 +90,7 @@ td.nul{color:var(--muted);font-style:italic}
 footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
+details.qa{border:0;background:transparent}details.qa>summary{padding:0;font-size:13px;color:var(--accent);font-weight:400}details.qa>summary::after{content:none}details.qa .in{padding:8px 0 0;font-size:15px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -145,17 +146,28 @@ html{scroll-behavior:smooth}
       <tr><td>排序、取前幾筆</td><td class="mono">ORDER BY … LIMIT n</td><td>F-3、G</td></tr>
     </tbody>
   </table></div>
-  <details>
-    <summary>快問快答 3 題（先想再展開）</summary>
-    <div class="in">
-      <p><b>Q1</b> 要找「付款超過 10 次的顧客」，條件 <code>COUNT(*) &gt; 10</code> 要寫在 WHERE 還是 HAVING？<br>
-      <span class="lead">→ HAVING。WHERE 在分組前執行，那時還沒有 COUNT 的結果。</span></p>
-      <p><b>Q2</b> <code>ON fc.film_id = c.category_id</code> 哪裡錯？<br>
-      <span class="lead">→ 兩邊意義不同。JOIN 要接「表示同一件事」的欄位：<code>fc.category_id = c.category_id</code>。</span></p>
-      <p><b>Q3</b> <code>return_date = NULL</code> 為什麼查不到資料？<br>
-      <span class="lead">→ NULL 不能用等號比較，要寫 <code>IS NULL</code>。</span></p>
-    </div>
-  </details>
+  <h3>快問快答 9 題</h3>
+  <p class="lead">每題 30 秒，先喊出答案再展開。</p>
+  <div class="grid2">
+    <div class="card"><span class="lbl">Q1 · 填空 · WHERE</span><p>找出租金 0.99 的影片：<code>SELECT title FROM film ____ rental_rate = 0.99;</code></p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p><code>WHERE</code>。篩選資料列用 WHERE。</p></div></details></div>
+    <div class="card"><span class="lbl">Q2 · 選一個 · SUM 還是 COUNT</span><p>「每位顧客付了多少錢」要用 <code>COUNT(amount)</code> 還是 <code>SUM(amount)</code>？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p><code>SUM(amount)</code>。COUNT 數的是筆數，SUM 才是金額加總。</p></div></details></div>
+    <div class="card"><span class="lbl">Q3 · WHERE 還是 HAVING</span><p>要找「付款超過 10 次的顧客」，條件 <code>COUNT(*) &gt; 10</code> 要寫在哪裡？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p>HAVING。WHERE 在分組前執行，那時還沒有 COUNT 的結果。</p></div></details></div>
+    <div class="card"><span class="lbl">Q4 · 找錯 · JOIN</span><p><code>JOIN category AS c ON fc.film_id = c.category_id</code> 哪裡錯？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p>兩邊意義不同。JOIN 要接表示同一件事的欄位：<code>fc.category_id = c.category_id</code>。</p></div></details></div>
+    <div class="card"><span class="lbl">Q5 · 找錯 · NULL</span><p><code>WHERE return_date = NULL</code> 為什麼一筆都查不到？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p>NULL 不能用等號比較，要寫 <code>IS NULL</code>。</p></div></details></div>
+    <div class="card"><span class="lbl">Q6 · 排序</span><p>「最近的 10 筆租借」和「最便宜的 10 部電影」各要用 ASC 還是 DESC？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p>最近 = 日期最大，<code>ORDER BY rental_date DESC LIMIT 10</code>；最便宜 = 由小到大，<code>ORDER BY rental_rate ASC LIMIT 10</code>。</p></div></details></div>
+    <div class="card"><span class="lbl">Q7 · 寫出來 · CONCAT</span><p>要輸出 <code>SMITH, MARY</code> 這種格式，CONCAT 怎麼寫？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p><code>CONCAT(last_name, ', ', first_name)</code>，逗號後面有一個空白。</p></div></details></div>
+    <div class="card"><span class="lbl">Q8 · 找錯 · GROUP BY</span><p><code>GROUP BY c.first_name</code> 統計每位顧客的付款次數，會出什麼問題？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p>名字相同的不同顧客會被併成一組。分組要用 <code>c.customer_id</code>。</p></div></details></div>
+    <div class="card"><span class="lbl">Q9 · 執行順序</span><p><code>SELECT COUNT(*) AS 次數 … ORDER BY 次數</code> 可以嗎？那 <code>WHERE 次數 &gt; 5</code> 呢？</p>
+      <details class="qa"><summary>看答案</summary><div class="in"><p>ORDER BY 可以用別名，它在 SELECT 之後執行；WHERE 不行，它在 SELECT 之前就執行了，要改寫成 <code>HAVING COUNT(*) &gt; 5</code>。</p></div></details></div>
+  </div>
 </section>
 
 <section id="fg">
