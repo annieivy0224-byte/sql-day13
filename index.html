@@ -378,39 +378,36 @@ html{scroll-behavior:smooth}
   </div></details>
 
   <details><summary>H</summary><div class="in">
-    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> r.rental_id <span class="k">AS</span> 租借ID,
-       <span class="k">CONCAT</span>(c.last_name, <span class="s">' '</span>, c.first_name) <span class="k">AS</span> 租借者姓名,
-       r.rental_date <span class="k">AS</span> 租借時間
-<span class="k">FROM</span> rental <span class="k">AS</span> r
-<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> r.customer_id = c.customer_id
-<span class="k">WHERE</span> r.rental_date &gt;= <span class="s">'2005-06-01'</span>
-  <span class="k">AND</span> r.rental_date &lt;  <span class="s">'2005-06-16'</span>
-<span class="k">ORDER BY</span> r.rental_date <span class="k">ASC</span>, r.rental_id <span class="k">ASC</span>;</pre></div>
+    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> rental_id <span class="k">as</span> <span class="s">&#x27;租借ID&#x27;</span>,  <span class="k">concat</span>(c.last_name,<span class="s">&#x27; &#x27;</span>,c.first_name) <span class="k">as</span> <span class="s">&#x27;租借者姓名&#x27;</span>,
+    rental_date <span class="k">as</span> <span class="s">&#x27;租借時間&#x27;</span>
+<span class="k">FROM</span> sakila.rental <span class="k">as</span> r
+<span class="k">join</span> customer <span class="k">as</span> c <span class="k">on</span> r.customer_id=c.customer_id
+<span class="k">WHERE</span> rental_date &gt;= <span class="s">&#x27;2005-06-01&#x27;</span> <span class="k">AND</span> rental_date &lt; <span class="s">&#x27;2005-06-16&#x27;</span>
+<span class="k">order by</span> rental_date;</pre></div>
   </div></details>
 
   <details><summary>I</summary><div class="in">
-    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> l.name <span class="k">AS</span> 語言名稱,
-       <span class="k">COUNT</span>(f.film_id) <span class="k">AS</span> 電影數量
-<span class="k">FROM</span> language <span class="k">AS</span> l
-<span class="k">LEFT JOIN</span> film <span class="k">AS</span> f <span class="k">ON</span> f.language_id = l.language_id
-<span class="k">GROUP BY</span> l.language_id, l.name
-<span class="k">ORDER BY</span> 電影數量 <span class="k">DESC</span>, l.name <span class="k">ASC</span>;</pre></div>
+    <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> l.name <span class="k">as</span> <span class="s">&#x27;語言名稱&#x27;</span>, <span class="k">count</span>(f.film_id) <span class="k">as</span> <span class="s">&#x27;電影數量&#x27;</span> <span class="k">FROM</span> sakila.language <span class="k">as</span> l
+<span class="k">left join</span> film <span class="k">as</span> f <span class="k">on</span> l.language_id=f.language_id
+<span class="k">group by</span> l.name
+<span class="k">order by</span> <span class="k">count</span>(f.film_id) <span class="k">desc</span>, l.name;</pre></div>
   </div></details>
 
   <details><summary>J-1、J-2</summary><div class="in">
     <div class="pre"><button class="cp" type="button">複製</button><pre><span class="c">-- J-1.sql</span>
-<span class="k">SELECT COUNT</span>(<span class="k">DISTINCT</span> r.customer_id) <span class="k">AS</span> 顧客人數
-<span class="k">FROM</span> rental <span class="k">AS</span> r
-<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> r.customer_id = c.customer_id;
+<span class="k">SELECT</span> <span class="k">count</span>(<span class="k">distinct</span> R.customer_id) <span class="k">AS</span> 顧客人數
+<span class="k">FROM</span> sakila.rental <span class="k">AS</span> R
+<span class="k">left JOIN</span> sakila.customer <span class="k">AS</span> C
+<span class="k">ON</span> R.customer_id = C.customer_id;
 
 <span class="c">-- J-2.sql</span>
-<span class="k">SELECT CONCAT</span>(c.last_name, <span class="s">' '</span>, c.first_name) <span class="k">AS</span> 顧客姓名,
-       <span class="k">COUNT</span>(*) <span class="k">AS</span> 租借次數
-<span class="k">FROM</span> rental <span class="k">AS</span> r
-<span class="k">JOIN</span> customer <span class="k">AS</span> c <span class="k">ON</span> r.customer_id = c.customer_id
-<span class="k">GROUP BY</span> c.customer_id, c.last_name, c.first_name
-<span class="k">ORDER BY</span> 租借次數 <span class="k">DESC</span>, 顧客姓名 <span class="k">ASC</span>
-<span class="k">LIMIT</span> 5;</pre></div>
+<span class="k">SELECT</span> <span class="k">concat</span>(last_name, <span class="s">&#x27; &#x27;</span>, first_name) <span class="k">AS</span> 顧客姓名, <span class="k">count</span>(rental_id) <span class="k">AS</span> 租借次數
+<span class="k">FROM</span> sakila.rental <span class="k">AS</span> R
+<span class="k">left JOIN</span> customer <span class="k">AS</span> C
+<span class="k">ON</span> R.customer_id = C.customer_id
+<span class="k">group by</span> 顧客姓名
+<span class="k">order by</span> 租借次數 <span class="k">desc</span>, 顧客姓名
+<span class="k">limit</span> 5;</pre></div>
   </div></details>
 
 </section>
