@@ -90,6 +90,7 @@ td.nul{color:var(--muted);font-style:italic}
 footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}.grid3>*{min-width:0}
 </style>
 </head>
 <body>
@@ -213,6 +214,15 @@ html{scroll-behavior:smooth}
       </tbody></table></div>
       <p class="lead" style="font-size:14px">程式設計社留下來，學生欄位是 NULL。</p></div>
   </div>
+
+  <h3>三種 JOIN 比較</h3>
+  <p class="lead" style="font-size:14px">左表 = 寫在 JOIN 前面的表（club），右表 = 寫在 JOIN 後面的表（student）。藍色是查詢結果會保留的部分。</p>
+  <div class="grid3">
+    <div class="card"><svg viewBox="0 0 200 116" width="100%" style="max-width:220px;display:block;margin:0 auto" aria-hidden="true"><defs><clipPath id="jv1"><circle cx="122" cy="58" r="44"/></clipPath></defs><circle cx="78" cy="58" r="44" clip-path="url(#jv1)" style="fill:var(--accent);fill-opacity:.55"/><g style="fill:none;stroke:var(--ink);stroke-width:1.5"><circle cx="78" cy="58" r="44"/><circle cx="122" cy="58" r="44"/></g><text x="54" y="62" text-anchor="middle" style="fill:var(--ink);font:600 10px var(--f-mono)">club</text><text x="145" y="62" text-anchor="middle" style="fill:var(--ink);font:600 10px var(--f-mono)">student</text></svg><span class="lbl">club JOIN student</span><p><b>JOIN（INNER JOIN）</b><br>只留兩邊都配對成功的資料。</p><p class="lead" style="font-size:14px">社團例子：吉他社、熱舞社；<b>程式設計社不見</b></p></div>
+    <div class="card"><svg viewBox="0 0 200 116" width="100%" style="max-width:220px;display:block;margin:0 auto" aria-hidden="true"><circle cx="78" cy="58" r="44" style="fill:var(--accent);fill-opacity:.55"/><g style="fill:none;stroke:var(--ink);stroke-width:1.5"><circle cx="78" cy="58" r="44"/><circle cx="122" cy="58" r="44"/></g><text x="54" y="62" text-anchor="middle" style="fill:var(--ink);font:600 10px var(--f-mono)">club</text><text x="145" y="62" text-anchor="middle" style="fill:var(--ink);font:600 10px var(--f-mono)">student</text></svg><span class="lbl">club LEFT JOIN student</span><p><b>LEFT JOIN</b><br>左表全部保留，右表配不到補 NULL。</p><p class="lead" style="font-size:14px">社團例子：三個社團都在；程式設計社的學生是 NULL</p></div>
+    <div class="card"><svg viewBox="0 0 200 116" width="100%" style="max-width:220px;display:block;margin:0 auto" aria-hidden="true"><circle cx="122" cy="58" r="44" style="fill:var(--accent);fill-opacity:.55"/><g style="fill:none;stroke:var(--ink);stroke-width:1.5"><circle cx="78" cy="58" r="44"/><circle cx="122" cy="58" r="44"/></g><text x="54" y="62" text-anchor="middle" style="fill:var(--ink);font:600 10px var(--f-mono)">club</text><text x="145" y="62" text-anchor="middle" style="fill:var(--ink);font:600 10px var(--f-mono)">student</text></svg><span class="lbl">club RIGHT JOIN student</span><p><b>RIGHT JOIN</b><br>右表全部保留，左表配不到補 NULL。</p><p class="lead" style="font-size:14px">社團例子：所有學生都在；若有學生沒加入社團，社團欄位是 NULL</p></div>
+  </div>
+  <div class="note"><code>a RIGHT JOIN b</code> 等於 <code>b LEFT JOIN a</code>，只是左右對調。實務上大多統一寫 LEFT JOIN，把「一定要全部列出的表」放左邊比較好讀。</div>
 
   <div class="pre"><button class="cp" type="button">複製</button><pre><span class="k">SELECT</span> 欄位
 <span class="k">FROM</span> 一定要全部列出的表 <span class="k">AS</span> a          <span class="c">-- 左表</span>
